@@ -1,0 +1,82 @@
+{
+  "Actor": {
+    "types": ["character", "threat"],
+    "character": {
+      "grit": 2,
+      "spirit": 2,
+      "xp": 0,
+      "xpEarned": 0,
+      "xpSpent": 0,
+      "xpLog": [],
+      "custom": false,
+      "hits": {
+        "value": 2,
+        "max": 2
+      },
+      "dramaPoints": {
+        "value": 2,
+        "max": 2
+      },
+      "cred": {
+        "value": 3,
+        "max": 3
+      },
+      "dying": {
+        "active": false,
+        "expiresIn": 3
+      },
+      "biography": ""
+    },
+    "threat": {
+      "dangerRating": 1,
+      "isBoss": false,
+      "bossHits": 0,
+      "hits": {
+        "value": 3,
+        "max": 3
+      },
+      "drive": "",
+      "tags": "",
+      "actions": [],
+      "conditions": [],
+      "problems": "",
+      "description": "",
+      "setting": "",
+      "notes": ""
+    }
+  },
+  "Item": {
+    "types": ["trademark", "flaw", "drive", "injury", "condition", "gear", "advantage", "tie"],
+    "trademark": {
+      "edges": [],
+      "memo": ""
+    },
+    "flaw": {
+      "name": "",
+      "description": ""
+    },
+    "drive": {
+      "name": "",
+      "description": ""
+    },
+    "advantage": {
+      "description": ""
+    },
+    "tie": {
+      "name": "",
+      "description": ""
+    },
+    "injury": {
+      "name": "",
+      "damage": 1
+    },
+    "condition": {
+      "name": ""
+    },
+    "gear": {
+  	"description": "",
+  	"tags": [],
+  	"cost": 0
+}
+  }
+}

@@ -1,0 +1,44 @@
+<div class="fu-roll-card">
+  {{#if flavor}}<div class="fu-roll-flavor">{{flavor}}</div>{{/if}}
+  {{#if actorName}}<div class="fu-roll-actor">{{actorName}}</div>{{/if}}
+
+  {{#if breakdown}}
+    <div class="fu-roll-breakdown">
+      {{#each breakdown as |section|}}
+        <div class="fu-bd-line"><span class="fu-bd-label">{{section.label}}:</span> {{#each section.items as |it|}}<span class="fu-bd-item">{{it}}</span>{{#unless @last}}, {{/unless}}{{/each}}</div>
+      {{/each}}
+      <div class="fu-bd-line fu-bd-pool"><span class="fu-bd-label">{{localize "FU.AR.Pool"}}:</span> {{localize "FU.ActionDice"}} {{actionTotal}} · {{localize "FU.DangerDice"}} {{dangerTotal}}</div>
+    </div>
+  {{/if}}
+
+  <div class="fu-roll-dice">
+    <div class="fu-roll-pool fu-action-pool">
+      <div class="fu-pool-label">{{localize "FU.ActionDice"}}</div>
+      <div class="fu-dice">
+        {{#each actionRolls as |d|}}
+          <span class="fu-die fu-action-die{{#if d.cancelled}} cancelled{{/if}} face-{{d.value}}">{{d.value}}</span>
+        {{/each}}
+      </div>
+    </div>
+    {{#if dangerRolls.length}}
+      <div class="fu-roll-pool fu-danger-pool">
+        <div class="fu-pool-label">{{localize "FU.DangerDice"}}</div>
+        <div class="fu-dice">
+          {{#each dangerRolls as |d|}}
+            <span class="fu-die fu-danger-die{{#if d.cancelled}} cancelled{{/if}} face-{{d.value}}">{{d.value}}</span>
+          {{/each}}
+        </div>
+      </div>
+    {{/if}}
+  </div>
+
+  <div class="fu-roll-result {{#if botch}}botch{{/if}}">
+    <div class="fu-oracle">{{oracleLabel}}</div>
+    {{#if hasBoons}}
+      <div class="fu-boons"><strong>{{localize "FU.Boons"}}:</strong> {{boons}}</div>
+    {{/if}}
+    {{#unless botch}}
+      <div class="fu-roll-detail">{{localize "FU.RollHighest"}}: <strong>{{outcome}}</strong></div>
+    {{/unless}}
+  </div>
+</div>

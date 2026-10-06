@@ -1,0 +1,361 @@
+<form class="{{cssClass}} fu-sheet fu-character" autocomplete="off">
+
+  <header class="fu-header">
+    <div class="fu-portrait" data-action="portrait-lightbox">
+      <img src="{{actor.img}}" data-edit="img" title="{{actor.name}}" alt="" />
+    </div>
+    <div class="fu-header-main">
+      <div class="fu-name-row">
+        <input type="text" name="name" value="{{actor.name}}" class="fu-name" placeholder="{{localize 'FU.CharacterName'}}" />
+        {{#if isCustom}}
+          <span class="fu-custom-badge" title="{{localize 'FU.CustomTitle'}}" data-action="clear-custom">⚙</span>
+        {{/if}}
+      </div>
+      <div class="fu-stat-row">
+        <div class="fu-stat">
+          <label>{{localize "FU.Grit"}}</label>
+          <input type="number" name="system.grit" value="{{system.grit}}" min="1" max="6" />
+        </div>
+        <div class="fu-stat">
+          <label>{{localize "FU.Spirit"}}</label>
+          <input type="number" name="system.spirit" value="{{system.spirit}}" min="1" max="6" />
+        </div>
+        <div class="fu-stat">
+          <label>{{localize "FU.Cred"}}</label>
+          <div class="fu-cred-track">
+            <input type="number" name="system.cred.value" value="{{system.cred.value}}" min="0" />
+            <span class="fu-cred-sep">/</span>
+            <input type="number" name="system.cred.max" value="{{system.cred.max}}" min="0" />
+          </div>
+        </div>
+        <button type="button" class="fu-roll-btn" data-action="roll" title="{{localize 'FU.RollTitle'}}">
+          <i class="fas fa-dice-d6"></i> {{localize "FU.Roll"}}
+        </button>
+      </div>
+    </div>
+  </header>
+
+  {{#if system.dying.active}}
+    <div class="fu-dying-banner">
+      <strong>{{localize "FU.Dying"}}</strong>
+      <label>{{localize "FU.DyingExpires"}}
+        <input type="number" name="system.dying.expiresIn" value="{{system.dying.expiresIn}}" min="0" step="1" />
+      </label>
+      <span class="fu-dying-note">{{localize "FU.DyingNote"}}</span>
+    </div>
+  {{/if}}
+
+  <nav class="sheet-tabs">
+    <a class="item" data-tab="main">{{localize "FU.TabMain"}}</a>
+    <a class="item" data-tab="gear">{{localize "FU.TabGear"}}</a>
+    <a class="item" data-tab="advancement">{{localize "FU.TabAdvancement"}}</a>
+    <a class="item" data-tab="bio">{{localize "FU.TabBio"}}</a>
+  </nav>
+
+  <section class="sheet-body">
+
+    {{!-- MAIN TAB --}}
+    <div class="tab" data-tab="main">
+
+      <div class="fu-tracks">
+        <div class="fu-track-block">
+          <label>{{localize "FU.Hits"}} <span class="fu-track-readout">{{system.hits.value}} / {{system.hits.max}}</span></label>
+          <div class="fu-track fu-track-hits">
+            {{#each hitBoxes as |filled i|}}
+              <span class="fu-box{{#if filled}} filled{{/if}}" data-action="track-set" data-target="hits" data-index="{{i}}"></span>
+            {{/each}}
+          </div>
+        </div>
+        <div class="fu-track-block">
+          <label>{{localize "FU.DramaPoints"}} <span class="fu-track-readout">{{system.dramaPoints.value}} / {{system.dramaPoints.max}}</span></label>
+          <div class="fu-track fu-track-drama">
+            {{#each dramaBoxes as |filled i|}}
+              <span class="fu-box{{#if filled}} filled{{/if}}" data-action="track-set" data-target="dramaPoints" data-index="{{i}}"></span>
+            {{/each}}
+          </div>
+        </div>
+      </div>
+
+      <section class="fu-block fu-trademarks">
+        <header>
+          <h2>{{localize "FU.Trademarks"}} <span class="fu-count">({{trademarks.length}}/{{trademarkLimit}})</span></h2>
+          <button type="button" data-action="trademark-add" title="{{localize 'FU.AddTrademark'}}"><i class="fas fa-plus"></i></button>
+        </header>
+        {{#if trademarks.length}}
+          {{#each trademarks as |tm|}}
+            <div class="fu-trademark" data-item-id="{{tm.id}}">
+              <div class="fu-trademark-head">
+                <button type="button" class="fu-chevron-btn" data-action="toggle-trademark" title="{{localize 'FU.Expand'}}"><i class="fas fa-chevron-right fu-chevron"></i></button>
+                <input type="text" class="fu-tm-name" value="{{tm.name}}" placeholder="{{localize 'FU.TrademarkPH'}}" data-action="trademark-name-edit" />
+                <button type="button" data-action="trademark-memo" title="Notes &amp; Capabilities"><i class="fas fa-info-circle"></i></button>
+                <button type="button" data-action="edge-add" title="{{localize 'FU.AddEdge'}}"><i class="fas fa-plus-circle"></i></button>
+                <button type="button" data-action="trademark-delete" title="{{localize 'FU.DeleteTrademark'}}"><i class="fas fa-trash"></i></button>
+              </div>
+              <div class="fu-edges">
+                {{#each tm.edges as |edge ei|}}
+                  <div class="fu-edge">
+                    <input type="text" value="{{edge}}" data-action="edge-edit" data-edge="{{ei}}" placeholder="{{localize 'FU.EdgePH'}}" />
+                    <button type="button" data-action="edge-delete" data-edge="{{ei}}" title="{{localize 'FU.DeleteEdge'}}"><i class="fas fa-times"></i></button>
+                  </div>
+                {{/each}}
+              </div>
+            </div>
+          {{/each}}
+        {{else}}
+          <p class="fu-empty">{{localize "FU.NoTrademarks"}}</p>
+        {{/if}}
+      </section>
+
+      <section class="fu-block fu-advantages">
+        <header>
+          <h2>{{localize "FU.Advantages"}} <span class="fu-count">({{advantages.length}}/{{advantageLimit}})</span></h2>
+          <button type="button" data-action="item-add" data-type="advantage" title="{{localize 'FU.AddAdvantage'}}"><i class="fas fa-plus"></i></button>
+        </header>
+        {{#if advantages.length}}
+          <div class="fu-item-list">
+            {{#each advantages as |a|}}
+              <div class="fu-item-row" data-item-id="{{a.id}}">
+                <input type="text" value="{{a.name}}" data-action="item-name-edit" placeholder="{{localize 'FU.AdvantageNamePH'}}" />
+                <button type="button" data-action="item-memo" title="{{localize 'FU.Memo'}}"><i class="fas fa-info-circle"></i></button>
+                <button type="button" data-action="item-delete" title="{{localize 'FU.Delete'}}"><i class="fas fa-times"></i></button>
+              </div>
+            {{/each}}
+          </div>
+        {{else}}
+          <p class="fu-empty">—</p>
+        {{/if}}
+      </section>
+
+      <section class="fu-block fu-flaws">
+        <header>
+          <h2>{{localize "FU.Flaws"}} <span class="fu-count">({{flaws.length}}/{{flawLimit}})</span></h2>
+          <button type="button" data-action="item-add" data-type="flaw" title="{{localize 'FU.AddFlaw'}}"><i class="fas fa-plus"></i></button>
+        </header>
+        {{#if flaws.length}}
+          <div class="fu-item-list">
+            {{#each flaws as |f|}}
+              <div class="fu-item-row" data-item-id="{{f.id}}">
+                <input type="text" value="{{f.name}}" data-action="item-name-edit" placeholder="{{localize 'FU.FlawPH'}}" />
+                <button type="button" data-action="item-memo" title="{{localize 'FU.Description'}}"><i class="fas fa-info-circle"></i></button>
+                <button type="button" data-action="item-delete" title="{{localize 'FU.Delete'}}"><i class="fas fa-times"></i></button>
+              </div>
+            {{/each}}
+          </div>
+        {{else}}
+          <p class="fu-empty">—</p>
+        {{/if}}
+      </section>
+
+      <section class="fu-block fu-drive">
+        <header>
+          <h2>{{localize "FU.Drive"}} <span class="fu-count">({{drives.length}}/{{driveLimit}})</span></h2>
+          <button type="button" data-action="item-add" data-type="drive" title="{{localize 'FU.AddDrive'}}"><i class="fas fa-plus"></i></button>
+        </header>
+        {{#if drives.length}}
+          <div class="fu-item-list">
+            {{#each drives as |d|}}
+              <div class="fu-item-row" data-item-id="{{d.id}}">
+                <input type="text" value="{{d.name}}" data-action="item-name-edit" placeholder="{{localize 'FU.DrivePH'}}" />
+                <button type="button" data-action="item-memo" title="{{localize 'FU.Description'}}"><i class="fas fa-info-circle"></i></button>
+                <button type="button" data-action="item-delete" title="{{localize 'FU.Delete'}}"><i class="fas fa-times"></i></button>
+              </div>
+            {{/each}}
+          </div>
+        {{else}}
+          <p class="fu-empty">—</p>
+        {{/if}}
+      </section>
+
+      <section class="fu-block fu-ties">
+        <header>
+          <h2>{{localize "FU.Ties"}} <span class="fu-count">({{ties.length}}/{{tieLimit}})</span></h2>
+          <button type="button" data-action="item-add" data-type="tie" title="{{localize 'FU.AddTie'}}"><i class="fas fa-plus"></i></button>
+        </header>
+        {{#if ties.length}}
+          <div class="fu-item-list">
+            {{#each ties as |t|}}
+              <div class="fu-item-row" data-item-id="{{t.id}}">
+                <input type="text" value="{{t.name}}" data-action="item-name-edit" placeholder="{{localize 'FU.TieNamePH'}}" />
+                <button type="button" data-action="item-memo" title="{{localize 'FU.Memo'}}"><i class="fas fa-info-circle"></i></button>
+                <button type="button" data-action="item-delete" title="{{localize 'FU.Delete'}}"><i class="fas fa-times"></i></button>
+              </div>
+            {{/each}}
+          </div>
+        {{else}}
+          <p class="fu-empty">—</p>
+        {{/if}}
+      </section>
+
+      <section class="fu-block fu-injuries">
+        <header>
+          <h2>{{localize "FU.Injuries"}} <span class="fu-count">({{injuries.length}}/{{system.grit}})</span></h2>
+          <button type="button" data-action="item-add" data-type="injury" title="{{localize 'FU.AddInjury'}}"><i class="fas fa-plus"></i></button>
+        </header>
+        {{#if injuries.length}}
+          <div class="fu-item-list">
+            {{#each injuries as |inj|}}
+              <div class="fu-item-row fu-injury-row" data-item-id="{{inj.id}}">
+                <input type="text" value="{{inj.name}}" data-action="item-name-edit"
+                  placeholder="{{localize 'FU.InjuryPH'}}" />
+                <div class="fu-injury-damage">
+                  <span class="fu-damage-pip{{#if (fuGt inj.damage 0)}} filled{{/if}}"
+                    data-action="injury-damage-set" data-damage="1">●</span>
+                  <span class="fu-damage-pip{{#if (fuGt inj.damage 1)}} filled{{/if}}"
+                    data-action="injury-damage-set" data-damage="2">●</span>
+                  <span class="fu-damage-pip{{#if (fuGt inj.damage 2)}} filled{{/if}}"
+                    data-action="injury-damage-set" data-damage="3">●</span>
+                </div>
+                <button type="button" data-action="item-delete" title="{{localize 'FU.Delete'}}">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            {{/each}}
+          </div>
+        {{else}}
+          <p class="fu-empty">—</p>
+        {{/if}}
+      </section>
+
+      <section class="fu-block fu-conditions">
+        <header>
+          <h2>{{localize "FU.Conditions"}}</h2>
+          <button type="button" data-action="item-add" data-type="condition" title="{{localize 'FU.AddCondition'}}"><i class="fas fa-plus"></i></button>
+        </header>
+        {{#if conditions.length}}
+          <div class="fu-item-list">
+            {{#each conditions as |c|}}
+              <div class="fu-item-row" data-item-id="{{c.id}}">
+                <input type="text" value="{{c.name}}" data-action="item-name-edit" placeholder="{{localize 'FU.ConditionPH'}}" />
+                <button type="button" data-action="item-delete" title="{{localize 'FU.Delete'}}"><i class="fas fa-times"></i></button>
+              </div>
+            {{/each}}
+          </div>
+        {{else}}
+          <p class="fu-empty">—</p>
+        {{/if}}
+      </section>
+    </div>
+
+    {{!-- GEAR TAB --}}
+    <div class="tab" data-tab="gear">
+      <section class="fu-block">
+        <header>
+          <h2>{{localize "FU.Gear"}}</h2>
+          <button type="button" data-action="gear-create" title="{{localize 'FU.AddGear'}}"><i class="fas fa-plus"></i></button>
+        </header>
+        {{#if gear.length}}
+          <ul class="fu-gear-list">
+            {{#each gear as |item|}}
+              <li class="fu-gear-row" data-item-id="{{item.id}}">
+                <div class="fu-gear-head">
+                  <button type="button" class="fu-chevron-btn" data-action="toggle-gear" title="{{localize 'FU.Expand'}}"><i class="fas fa-chevron-right fu-chevron"></i></button>
+                  <span class="fu-gear-name">{{item.name}}</span>
+                  <button type="button" data-action="gear-tag-add" title="{{localize 'FU.AddTag'}}"><i class="fas fa-plus-circle"></i></button>
+                  <button type="button" data-action="gear-edit" title="{{localize 'FU.Edit'}}"><i class="fas fa-edit"></i></button>
+                  <button type="button" data-action="gear-delete" title="{{localize 'FU.Delete'}}"><i class="fas fa-trash"></i></button>
+                </div>
+                <div class="fu-gear-tags-list">
+                  {{#each item.tags as |tag|}}
+                    <div class="fu-gear-tag-row">
+                      <input type="text" data-action="gear-tag-edit" data-tag-id="{{tag.id}}" value="{{tag.name}}" placeholder="{{localize 'FU.TagPH'}}" />
+                      <button type="button" data-action="gear-tag-delete" data-tag-id="{{tag.id}}" title="{{localize 'FU.DeleteTag'}}"><i class="fas fa-times"></i></button>
+                    </div>
+                  {{/each}}
+                  {{#unless item.tags.length}}
+                    <p class="fu-empty fu-gear-no-tags">{{localize "FU.NoGearTags"}}</p>
+                  {{/unless}}
+                </div>
+              </li>
+            {{/each}}
+          </ul>
+        {{else}}
+          <p class="fu-empty">{{localize "FU.NoGear"}}</p>
+        {{/if}}
+      </section>
+    </div>
+
+    {{!-- ADVANCEMENT TAB --}}
+    <div class="tab" data-tab="advancement">
+      <section class="fu-block">
+        <header>
+          <h2>{{localize "FU.Experience"}}</h2>
+        </header>
+        <div class="fu-track-block">
+          <label>{{localize "FU.XP"}} <span class="fu-track-readout">{{system.xp}}/10</span></label>
+          <div class="fu-track fu-track-xp">
+            {{#each xpBoxes as |filled i|}}
+              <span class="fu-box{{#if filled}} filled{{/if}}" data-action="xp-set" data-index="{{i}}"></span>
+            {{/each}}
+          </div>
+        </div>
+        <button type="button" class="fu-advance-btn" data-action="advance">
+          <i class="fas fa-level-up-alt"></i> {{localize "FU.SpendXP"}}
+        </button>
+      </section>
+
+      <section class="fu-block fu-xp-award">
+        <header><h2>{{localize "FU.XP.AwardHeader"}}</h2></header>
+        <div class="fu-xp-criteria">
+          <label class="fu-xp-criterion-row">
+            <input type="checkbox" class="fu-xp-criterion" />
+            <span>{{localize "FU.XPTrigger.Enemy"}}</span>
+          </label>
+          <label class="fu-xp-criterion-row">
+            <input type="checkbox" class="fu-xp-criterion" />
+            <span>{{localize "FU.XPTrigger.Prize"}}</span>
+          </label>
+          <label class="fu-xp-criterion-row">
+            <input type="checkbox" class="fu-xp-criterion" />
+            <span>{{localize "FU.XPTrigger.Detail"}}</span>
+          </label>
+          <label class="fu-xp-criterion-row">
+            <input type="checkbox" class="fu-xp-criterion" />
+            <span>{{localize "FU.XPTrigger.Mission"}}</span>
+          </label>
+        </div>
+        <button type="button" class="fu-xp-award-btn" data-action="xp-award">
+          <i class="fas fa-plus-circle"></i> {{localize "FU.XP.AwardButton"}}
+        </button>
+      </section>
+
+      <section class="fu-block fu-career-xp">
+        <header><h2>{{localize "FU.XP.CareerHeader"}}</h2></header>
+        <div class="fu-career-xp-totals">
+          <span><strong>{{localize "FU.XP.Earned"}}:</strong> {{xpEarned}}</span>
+          <span class="fu-career-sep">·</span>
+          <span><strong>{{localize "FU.XP.Spent"}}:</strong> {{xpSpent}}</span>
+          <span class="fu-career-sep">·</span>
+          <span><strong>{{localize "FU.XP.Net"}}:</strong> {{xpNet}}</span>
+        </div>
+        {{#if xpLog.length}}
+          <div class="fu-xp-log">
+            {{#each xpLog as |entry idx|}}
+              <div class="fu-xp-log-entry{{#if (fuEq idx 0)}} fu-xp-log-latest{{/if}}">
+                <span class="fu-xp-log-date">{{entry.date}}</span>
+                <span class="fu-xp-log-cost">−{{entry.cost}} XP</span>
+                <span class="fu-xp-log-desc">{{entry.description}}</span>
+                {{#if (fuEq idx 0)}}
+                  <button type="button" class="fu-xp-undo-btn" data-action="xp-undo"
+                    title="{{localize 'FU.XP.UndoTitle'}}">
+                    <i class="fas fa-undo"></i>
+                  </button>
+                {{/if}}
+              </div>
+            {{/each}}
+          </div>
+        {{else}}
+          <p class="fu-empty">{{localize "FU.XP.LogEmpty"}}</p>
+        {{/if}}
+      </section>
+    </div>
+
+    {{!-- BIOGRAPHY TAB --}}
+    <div class="tab" data-tab="bio">
+      <section class="fu-block fu-memo fu-bio-block">
+        <header><h2>{{localize "FU.Biography"}}</h2></header>
+        {{editor enrichedBiography target="system.biography" button=true editable=editable engine="prosemirror" collaborate=false}}
+      </section>
+    </div>
+
+  </section>
+</form>

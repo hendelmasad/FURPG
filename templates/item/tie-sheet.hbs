@@ -1,0 +1,15 @@
+<form class="{{cssClass}} fu-sheet fu-simple-item-sheet fu-tie-sheet" autocomplete="off">
+  <header class="fu-header">
+    <div class="fu-portrait small">
+      <img src="{{item.img}}" data-edit="img" title="{{item.name}}" alt="" />
+    </div>
+    <input type="text" name="name" value="{{item.name}}" class="fu-name" placeholder="{{localize 'FU.TieNamePH'}}" />
+  </header>
+
+  <section class="sheet-body">
+    <div class="fu-block fu-memo">
+      <header><h2>{{localize "FU.Description"}}</h2></header>
+      {{editor enrichedDescription target="system.description" button=true editable=editable engine="prosemirror" collaborate=false}}
+    </div>
+  </section>
+</form>

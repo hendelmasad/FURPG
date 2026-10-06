@@ -1,0 +1,6 @@
+.claude/
+packs_backup/
+*.zip
+packs/**/LOCK
+packs/**/LOG
+packs/**/LOG.old

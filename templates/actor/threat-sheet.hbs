@@ -1,0 +1,124 @@
+<form class="{{cssClass}} fu-sheet fu-threat" autocomplete="off">
+
+  <header class="fu-header">
+    <div class="fu-portrait" data-action="portrait-lightbox">
+      <img src="{{actor.img}}" data-edit="img" title="{{actor.name}}" />
+    </div>
+    <div class="fu-header-main">
+      <input type="text" name="name" value="{{actor.name}}" class="fu-name" placeholder="{{localize 'FU.ThreatNamePH'}}" />
+      <div class="fu-stat-row">
+        <div class="fu-stat fu-danger">
+          <label>{{localize "FU.DangerRating"}}</label>
+          <input type="number" name="system.dangerRating" value="{{system.dangerRating}}" min="0" max="5" />
+        </div>
+        <label class="fu-boss-toggle">
+          <input type="checkbox" name="system.isBoss" {{checked system.isBoss}} />
+          {{localize "FU.IsBoss"}}
+        </label>
+      </div>
+      <div class="fu-drive-row">
+        <label>{{localize "FU.ThreatDrive"}}</label>
+        <input type="text" name="system.drive" value="{{system.drive}}" placeholder="{{localize 'FU.ThreatDrivePH'}}" />
+      </div>
+      <div class="fu-setting-row">
+        <label>{{localize "FU.Setting"}}</label>
+        <input type="text" name="system.setting" value="{{system.setting}}" placeholder="{{localize 'FU.SettingPH'}}" />
+      </div>
+    </div>
+  </header>
+
+  {{#if system.isBoss}}
+    <div class="fu-boss-note">
+      <i class="fas fa-info-circle"></i> {{localize "FU.BossNote"}}
+    </div>
+  {{/if}}
+
+  <section class="sheet-body">
+
+    <section class="fu-block">
+      <header>
+        <h2>{{localize "FU.Hits"}}
+          <span class="fu-track-readout">{{system.hits.value}} / {{effectiveMax}}</span>
+        </h2>
+        <div class="fu-hits-controls">
+          <button type="button" data-action="hits-max-dec" title="-1 max">-</button>
+          <button type="button" data-action="hits-max-inc" title="+1 max">+</button>
+        </div>
+      </header>
+      {{#if system.isBoss}}
+        <div class="fu-boss-pcs">
+          <label>{{localize "FU.NumPCs"}}</label>
+          <input type="number" name="system.bossHits" value="{{system.bossHits}}" min="0" max="12" />
+          <span class="fu-boss-pcs-calc">{{baseMax}} + {{system.bossHits}} = {{effectiveMax}}</span>
+        </div>
+      {{/if}}
+      <div class="fu-track fu-track-hits">
+        {{#each hitBoxes as |filled i|}}
+          <span class="fu-box{{#if filled}} filled{{/if}}" data-action="track-set" data-index="{{i}}"></span>
+        {{/each}}
+      </div>
+    </section>
+
+    <section class="fu-block fu-memo">
+      <header><h2>{{localize "FU.Tags"}}</h2></header>
+      {{editor enrichedTags target="system.tags" button=true editable=editable engine="prosemirror" collaborate=false}}
+    </section>
+
+    <section class="fu-block">
+      <header>
+        <h2>{{localize "FU.Actions"}}</h2>
+        <button type="button" data-action="action-add" title="{{localize 'FU.AddAction'}}"><i class="fas fa-plus"></i></button>
+      </header>
+      {{#if system.actions.length}}
+        <div class="fu-tag-list fu-action-list">
+          {{#each system.actions as |act i|}}
+            <div class="fu-tag-row fu-action-row">
+              <input type="text" name="system.actions.{{i}}.name" value="{{act.name}}" placeholder="{{localize 'FU.ActionPH'}}" />
+              <button type="button" data-action="action-delete" data-index="{{i}}" title="{{localize 'FU.Delete'}}"><i class="fas fa-times"></i></button>
+            </div>
+          {{/each}}
+        </div>
+      {{else}}
+        <p class="fu-empty">—</p>
+      {{/if}}
+    </section>
+
+    <section class="fu-block">
+      <header>
+        <h2>{{localize "FU.Conditions"}}</h2>
+        <button type="button" data-action="condition-add" title="{{localize 'FU.AddCondition'}}"><i class="fas fa-plus"></i></button>
+      </header>
+      {{#if system.conditions.length}}
+        <div class="fu-tag-list fu-condition-list">
+          {{#each system.conditions as |cond i|}}
+            <div class="fu-tag-row fu-condition-row{{#if cond.active}} active{{/if}}">
+              <label class="fu-condition-check" title="{{localize 'FU.ConditionActive'}}">
+                <input type="checkbox" name="system.conditions.{{i}}.active" {{checked cond.active}} />
+              </label>
+              <input type="text" name="system.conditions.{{i}}.name" value="{{cond.name}}" placeholder="{{localize 'FU.ConditionPH'}}" />
+              <button type="button" data-action="condition-delete" data-index="{{i}}" title="{{localize 'FU.Delete'}}"><i class="fas fa-times"></i></button>
+            </div>
+          {{/each}}
+        </div>
+      {{else}}
+        <p class="fu-empty">—</p>
+      {{/if}}
+    </section>
+
+    <details class="fu-block fu-collapse">
+      <summary><h2>{{localize "FU.Problems"}}</h2></summary>
+      <textarea name="system.problems" rows="4" placeholder="{{localize 'FU.ProblemsPH'}}">{{system.problems}}</textarea>
+    </details>
+
+    <details class="fu-block fu-collapse fu-memo">
+      <summary><h2>{{localize "FU.Description"}}</h2></summary>
+      {{editor enrichedDescription target="system.description" button=true editable=editable engine="prosemirror" collaborate=false}}
+    </details>
+
+    <section class="fu-block fu-memo">
+      <header><h2>{{localize "FU.Notes"}}</h2></header>
+      {{editor enrichedNotes target="system.notes" button=true editable=editable engine="prosemirror" collaborate=false}}
+    </section>
+
+  </section>
+</form>

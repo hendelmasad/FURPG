@@ -1,0 +1,83 @@
+{
+  "id": "freeform-universal",
+  "title": "Freeform Universal",
+  "socket": true,
+  "description": "A fiction-first narrative RPG using pools of Action Dice vs Danger Dice. Only players roll; the GM never rolls. Resolution uses a six-outcome Oracle.",
+  "version": "1.0.0",
+  "compatibility": {
+    "minimum": "12",
+    "verified": "14",
+    "maximum": "14"
+  },
+  "authors": [
+    {
+      "name": "Freeform Universal System"
+    }
+  ],
+  "esmodules": [
+    "module/freeform-universal.mjs"
+  ],
+  "styles": [
+    "styles/freeform-universal.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "packs": [
+    {
+      "name": "fu-character-templates",
+      "label": "Character Templates",
+      "path": "packs/fu-character-templates",
+      "type": "Actor",
+      "system": "freeform-universal"
+    },
+    {
+      "name": "fu-trademarks",
+      "label": "Trademarks",
+      "path": "packs/fu-trademarks",
+      "type": "Item",
+      "system": "freeform-universal"
+    },
+    {
+      "name": "fu-flaws",
+      "label": "Flaws",
+      "path": "packs/fu-flaws",
+      "type": "Item",
+      "system": "freeform-universal"
+    },
+    {
+      "name": "fu-conditions",
+      "label": "Conditions",
+      "path": "packs/fu-conditions",
+      "type": "Item",
+      "system": "freeform-universal"
+    },
+    {
+      "name": "fu-injuries",
+      "label": "Injuries",
+      "path": "packs/fu-injuries",
+      "type": "Item",
+      "system": "freeform-universal"
+    },
+    {
+      "name": "fu-rules-reference",
+      "label": "Rules Reference",
+      "path": "packs/fu-rules-reference",
+      "type": "JournalEntry",
+      "system": "freeform-universal"
+    }
+  ],
+  "grid": {
+    "distance": 5,
+    "units": "ft"
+  },
+  "primaryTokenAttribute": "hits",
+  "secondaryTokenAttribute": "dramaPoints",
+  "url": "https://github.com/hendelmasad/FURPG",
+  "manifest": "https://github.com/hendelmasad/FURPG/releases/latest/download/system.json",
+  "download": "https://github.com/hendelmasad/FURPG/releases/download/v1.0.0/freeform-universal.zip"
+}

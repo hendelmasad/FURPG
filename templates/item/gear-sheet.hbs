@@ -1,0 +1,36 @@
+<form class="{{cssClass}} fu-sheet fu-gear-sheet" autocomplete="off">
+  <header class="fu-header">
+    <div class="fu-portrait small">
+      <img src="{{item.img}}" data-edit="img" title="{{item.name}}" />
+    </div>
+    <input type="text" name="name" value="{{item.name}}" class="fu-name" placeholder="{{localize 'FU.GearNamePH'}}" />
+<div class="fu-gear-cost">
+  <label>{{localize "FU.Cost"}}</label>
+  <input type="number" name="system.cost" value="{{system.cost}}" min="0" />
+</div>
+  </header>
+
+  <section class="sheet-body">
+    <div class="fu-block">
+      <header>
+        <h2>{{localize "FU.GearTags"}}</h2>
+        <button type="button" data-action="gear-tag-add" title="{{localize 'FU.AddTag'}}"><i class="fas fa-plus"></i></button>
+      </header>
+      <div class="fu-gear-tags-list fu-gear-tags-editor">
+        {{#each tags as |tag|}}
+          <div class="fu-gear-tag-row">
+            <input type="text" data-action="gear-tag-edit" data-tag-id="{{tag.id}}" value="{{tag.name}}" placeholder="{{localize 'FU.TagPH'}}" />
+            <button type="button" data-action="gear-tag-delete" data-tag-id="{{tag.id}}" title="{{localize 'FU.DeleteTag'}}"><i class="fas fa-times"></i></button>
+          </div>
+        {{/each}}
+        {{#unless tags.length}}
+          <p class="fu-empty">{{localize "FU.NoGearTags"}}</p>
+        {{/unless}}
+      </div>
+    </div>
+    <div class="fu-block fu-memo">
+      <header><h2>{{localize "FU.Description"}}</h2></header>
+      {{editor enrichedDescription target="system.description" button=true editable=editable engine="prosemirror" collaborate=false}}
+    </div>
+  </section>
+</form>

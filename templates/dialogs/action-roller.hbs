@@ -1,0 +1,200 @@
+<div class="fu-action-roller">
+
+  {{!-- TRADEMARKS --}}
+  <div class="ar-section">
+    <p class="ar-section-title">{{localize "FU.AR.TrademarksLabel"}}</p>
+    <p class="ar-section-hint">{{localize "FU.AR.TrademarksHint"}}</p>
+    {{#if hasTrademarks}}
+      {{#each trademarks as |tm|}}
+        <div class="ar-tm-block{{#if tm.checked}} expanded{{/if}}" data-trademark="{{tm.idx}}">
+          <div class="ar-tm-row ar-row">
+            <i class="ar-chevron fas fa-caret-right"></i>
+            <label>
+              <input type="checkbox" data-ar="trademark" data-index="{{tm.idx}}" {{checked tm.checked}} {{#if tm.disabled}}disabled{{/if}} />
+              <strong>{{tm.name}}</strong>
+            </label>
+          </div>
+          <div class="ar-edges">
+            {{#each tm.edges as |edge|}}
+              <div class="ar-edge-row ar-row">
+                <label>
+                  <input type="checkbox" data-ar="edge" data-trademark="{{tm.idx}}" data-edge="{{edge.idx}}"
+                    {{checked edge.checked}} {{#if edge.disabled}}disabled{{/if}} />
+                  {{edge.name}}
+                </label>
+              </div>
+            {{/each}}
+          </div>
+        </div>
+      {{/each}}
+    {{else}}
+      <p class="ar-empty">{{localize "FU.AR.NoTrademarks"}}</p>
+    {{/if}}
+  </div>
+
+  {{!-- FLAWS --}}
+  <div class="ar-section">
+    <p class="ar-section-title">{{localize "FU.AR.FlawsLabel"}}</p>
+    <p class="ar-section-hint">{{localize "FU.AR.FlawsHint"}}</p>
+    {{#if hasFlaws}}
+      {{#each flaws as |flaw|}}
+        <div class="ar-row">
+          <label>
+            <input type="checkbox" data-ar="flaw" data-index="{{flaw.idx}}" {{checked flaw.checked}} />
+            {{flaw.name}}
+          </label>
+        </div>
+      {{/each}}
+    {{else}}
+      <p class="ar-empty">{{localize "FU.AR.NoFlaws"}}</p>
+    {{/if}}
+  </div>
+
+  {{!-- ASSETS (Gear) --}}
+  <div class="ar-section">
+    <p class="ar-section-title">{{localize "FU.AR.GearLabel"}}</p>
+    <p class="ar-section-hint">{{localize "FU.AR.GearHint"}}</p>
+    {{#if hasGear}}
+      {{#each gear as |item|}}
+        <div class="ar-gear-item{{#if item.checked}} expanded{{/if}}" data-gear="{{item.idx}}">
+          <div class="ar-gear-head ar-row">
+            <i class="ar-chevron fas fa-caret-right"></i>
+            <label>
+              <input type="checkbox" data-ar="gear" data-index="{{item.idx}}" {{checked item.checked}} />
+              <span class="ar-gear-name">{{item.name}}</span>
+            </label>
+          </div>
+          <div class="ar-gear-tags">
+            {{#each item.tags as |tag|}}
+              <div class="ar-gear-tag-row ar-row">
+                <span class="ar-tag-name">{{tag.name}}</span>
+                <label class="ar-ad-label ar-ad-action">
+                  <input type="checkbox" data-ar="gear-tag-a" data-gear="{{item.idx}}" data-tag="{{tag.idx}}" {{checked tag.action}} />
+                  +A
+                </label>
+                <label class="ar-ad-label ar-ad-danger">
+                  <input type="checkbox" data-ar="gear-tag-d" data-gear="{{item.idx}}" data-tag="{{tag.idx}}" {{checked tag.danger}} />
+                  +D
+                </label>
+              </div>
+            {{/each}}
+          </div>
+        </div>
+      {{/each}}
+    {{else}}
+      <p class="ar-empty">{{localize "FU.AR.NoGear"}}</p>
+    {{/if}}
+  </div>
+
+  {{!-- INJURIES --}}
+  <div class="ar-section">
+    <p class="ar-section-title">{{localize "FU.AR.InjuriesLabel"}}</p>
+    <p class="ar-section-hint">{{localize "FU.AR.InjuriesHint"}}</p>
+    {{#if hasInjuries}}
+      {{#each injuries as |inj|}}
+        <div class="ar-row">
+          <label>
+            <input type="checkbox" data-ar="injury" data-index="{{inj.idx}}" {{checked inj.checked}} />
+            {{inj.name}}
+          </label>
+        </div>
+      {{/each}}
+    {{else}}
+      <p class="ar-empty">{{localize "FU.AR.NoInjuries"}}</p>
+    {{/if}}
+  </div>
+
+  {{!-- CONDITIONS --}}
+  <div class="ar-section">
+    <p class="ar-section-title">{{localize "FU.AR.ConditionsLabel"}}</p>
+    <p class="ar-section-hint">{{localize "FU.AR.ConditionsHint"}}</p>
+    {{#if hasConditions}}
+      {{#each conditions as |cond|}}
+        <div class="ar-row">
+          <label>
+            <input type="checkbox" data-ar="condition" data-index="{{cond.idx}}" {{checked cond.checked}} />
+            {{cond.name}}
+          </label>
+        </div>
+      {{/each}}
+    {{else}}
+      <p class="ar-empty">{{localize "FU.AR.NoConditions"}}</p>
+    {{/if}}
+  </div>
+
+  {{!-- GM / MODIFIERS --}}
+  <div class="ar-section">
+    <p class="ar-section-title">{{localize "FU.AR.GMLabel"}}</p>
+    <p class="ar-section-hint">{{localize "FU.AR.GMHint"}}</p>
+    <div class="ar-mod-row">
+      <div class="ar-mod-field">
+        <span>{{localize "FU.AR.DangerMods"}}</span>
+        <select data-ar="danger-mod">
+          <option value="0"  {{#if (fuEq danger 0)}}selected{{/if}}>0</option>
+          <option value="1"  {{#if (fuEq danger 1)}}selected{{/if}}>1</option>
+          <option value="2"  {{#if (fuEq danger 2)}}selected{{/if}}>2</option>
+          <option value="3"  {{#if (fuEq danger 3)}}selected{{/if}}>3</option>
+          <option value="4"  {{#if (fuEq danger 4)}}selected{{/if}}>4</option>
+          <option value="5"  {{#if (fuEq danger 5)}}selected{{/if}}>5</option>
+          <option value="6"  {{#if (fuEq danger 6)}}selected{{/if}}>6</option>
+          <option value="7"  {{#if (fuEq danger 7)}}selected{{/if}}>7</option>
+          <option value="8"  {{#if (fuEq danger 8)}}selected{{/if}}>8</option>
+          <option value="9"  {{#if (fuEq danger 9)}}selected{{/if}}>9</option>
+          <option value="10" {{#if (fuEq danger 10)}}selected{{/if}}>10</option>
+        </select>
+      </div>
+      <div class="ar-mod-field">
+        <span>{{localize "FU.AR.FavorableMods"}}</span>
+        <select data-ar="favorable-mod">
+          <option value="0"  {{#if (fuEq favorable 0)}}selected{{/if}}>0</option>
+          <option value="1"  {{#if (fuEq favorable 1)}}selected{{/if}}>1</option>
+          <option value="2"  {{#if (fuEq favorable 2)}}selected{{/if}}>2</option>
+          <option value="3"  {{#if (fuEq favorable 3)}}selected{{/if}}>3</option>
+          <option value="4"  {{#if (fuEq favorable 4)}}selected{{/if}}>4</option>
+          <option value="5"  {{#if (fuEq favorable 5)}}selected{{/if}}>5</option>
+          <option value="6"  {{#if (fuEq favorable 6)}}selected{{/if}}>6</option>
+          <option value="7"  {{#if (fuEq favorable 7)}}selected{{/if}}>7</option>
+          <option value="8"  {{#if (fuEq favorable 8)}}selected{{/if}}>8</option>
+          <option value="9"  {{#if (fuEq favorable 9)}}selected{{/if}}>9</option>
+          <option value="10" {{#if (fuEq favorable 10)}}selected{{/if}}>10</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  {{!-- A LITTLE LUCK --}}
+  <div class="ar-section">
+    <p class="ar-section-title">{{localize "FU.AR.ALittleLuck"}}</p>
+    <p class="ar-section-hint">{{localize "FU.AR.ALittleLuckHint"}}</p>
+    <div class="ar-luck-field">
+      <span>Drama Points to spend</span>
+      <input type="number" data-ar="luck" value="{{luck}}" min="0" max="{{luckMax}}" step="1" />
+    </div>
+  </div>
+
+  {{!-- POOL SUMMARY --}}
+  <div class="ar-summary">
+    <span class="ar-summary-line">
+      <span class="ar-summary-label">{{localize "FU.AR.Pool"}}</span>
+      <span class="ar-summary-label">{{localize "FU.ActionDice"}}</span>
+      <span class="ar-action-count">{{actionCount}}</span>
+      <span class="ar-summary-sep">·</span>
+      <span class="ar-summary-label">{{localize "FU.DangerDice"}}</span>
+      <span class="ar-danger-count">{{dangerCount}}</span>
+    </span>
+    {{#if dramaCurrent}}
+      <span class="ar-summary-drama">
+        {{localize "FU.DramaPoints"}}: {{dramaCurrent}}
+      </span>
+    {{/if}}
+  </div>
+
+  {{!-- ACTIONS --}}
+  <div class="ar-actions">
+    <button type="button" class="ar-cancel-btn" data-ar="cancel">{{localize "FU.Cancel"}}</button>
+    <button type="button" class="ar-roll-btn" data-ar="roll">
+      {{#if isGM}}{{localize "FU.Roll"}}{{else}}{{localize "FU.AR.SendToGM"}}{{/if}}
+    </button>
+  </div>
+
+</div>

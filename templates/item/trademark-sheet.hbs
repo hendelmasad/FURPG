@@ -1,0 +1,31 @@
+<form class="{{cssClass}} fu-sheet fu-trademark-sheet" autocomplete="off">
+  <header class="fu-header">
+    <div class="fu-portrait small">
+      <img src="{{item.img}}" data-edit="img" title="{{item.name}}" alt="" />
+    </div>
+    <input type="text" name="name" value="{{item.name}}" class="fu-name" placeholder="{{localize 'FU.TrademarkPH'}}" />
+  </header>
+  <section class="sheet-body">
+    <div class="fu-block fu-trademarks">
+      <header>
+        <h2>{{localize "FU.Edges"}}</h2>
+        <button type="button" data-action="edge-add" title="{{localize 'FU.AddEdge'}}"><i class="fas fa-plus"></i></button>
+      </header>
+      <div class="fu-edges">
+        {{#each edges as |edge ei|}}
+          <div class="fu-edge">
+            <input type="text" data-action="edge-edit" data-edge="{{ei}}" value="{{edge}}" placeholder="{{localize 'FU.EdgePH'}}" />
+            <button type="button" data-action="edge-delete" data-edge="{{ei}}" title="{{localize 'FU.DeleteEdge'}}"><i class="fas fa-times"></i></button>
+          </div>
+        {{/each}}
+        {{#unless edges.length}}
+          <p class="fu-empty">{{localize "FU.NoEdges"}}</p>
+        {{/unless}}
+      </div>
+    </div>
+    <div class="fu-block fu-memo">
+      <header><h2>{{localize "FU.Memo"}}</h2></header>
+      {{editor enrichedMemo target="system.memo" button=true editable=editable engine="prosemirror" collaborate=false}}
+    </div>
+  </section>
+</form>
