@@ -41,6 +41,7 @@ export class FUThreatSheet extends foundry.appv1.sheets.ActorSheet {
     const enrichOpts = { secrets: this.actor.isOwner, relativeTo: this.actor };
     context.enrichedNotes = await TE.enrichHTML(context.system.notes || "", enrichOpts);
     context.enrichedDescription = await TE.enrichHTML(context.system.description || "", enrichOpts);
+    context.enrichedTags = await TE.enrichHTML(context.system.tags || "", enrichOpts);
     return context;
   }
 

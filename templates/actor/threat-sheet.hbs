@@ -61,7 +61,7 @@
 
     <section class="fu-block">
       <header><h2>{{localize "FU.Tags"}}</h2></header>
-      <textarea name="system.tags" rows="5" placeholder="{{localize 'FU.ThreatTagsPH'}}">{{system.tags}}</textarea>
+      {{editor enrichedTags target="system.tags" button=true editable=editable engine="prosemirror" collaborate=false}}
     </section>
 
     <section class="fu-block">
