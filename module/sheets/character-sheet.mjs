@@ -63,8 +63,6 @@ export class FUCharacterSheet extends foundry.appv1.sheets.ActorSheet {
       this.actor.update({ "system.custom": isCustom }, { render: false });
 
     context.xpBoxes    = Array.from({ length: 10 }, (_, i) => i < (context.system.xp || 0));
-    context.hitBoxes   = Array.from({ length: context.system.hits.max }, (_, i) => i < context.system.hits.value);
-    context.dramaBoxes = Array.from({ length: context.system.dramaPoints.max }, (_, i) => i < context.system.dramaPoints.value);
     context.injuryOverflow = context.injuries.length > context.system.grit;
     context.xpTriggers = ["FU.XPTrigger.Enemy","FU.XPTrigger.Prize","FU.XPTrigger.Detail","FU.XPTrigger.Mission"];
 
@@ -107,8 +105,8 @@ export class FUCharacterSheet extends foundry.appv1.sheets.ActorSheet {
     if (!this.isEditable) return;
 
     html.find("[data-action='roll']").on("click", () => this._openRollDialog());
-    html.find("[data-action='track-set']").on("click", ev => this._onTrackSet(ev));
     html.find("[data-action='xp-set']").on("click", ev => this._onXpSet(ev));
+    html.find("[data-action='track-rest']").on("click", ev => this._onTrackRest(ev));
 
     html.find("[data-action='trademark-add']").on("click", () => this._addTrademark());
     html.find("[data-action='trademark-delete']").on("click", ev => this._deleteTrademark(ev));
@@ -172,19 +170,18 @@ export class FUCharacterSheet extends foundry.appv1.sheets.ActorSheet {
 
   async _openRollDialog() { new ActionRoller(this.actor).render(true); }
 
-  async _onTrackSet(ev) {
-    ev.preventDefault();
-    const target = ev.currentTarget.dataset.target;
-    const index  = Number(ev.currentTarget.dataset.index);
-    const current = foundry.utils.getProperty(this.actor.system, `${target}.value`);
-    await this.actor.update({ [`system.${target}.value`]: (current === index + 1) ? index : index + 1 });
-  }
-
   async _onXpSet(ev) {
     ev.preventDefault();
     const index   = Number(ev.currentTarget.dataset.index);
     const current = Number(this.actor.system.xp) || 0;
     await this.actor.update({ "system.xp": (current === index + 1) ? index : index + 1 });
+  }
+
+  async _onTrackRest(ev) {
+    ev.preventDefault();
+    const target = ev.currentTarget.dataset.target;
+    const max = foundry.utils.getProperty(this.actor.system, `${target}.max`);
+    await this.actor.update({ [`system.${target}.value`]: max });
   }
 
   /* ---- Career XP ---- */

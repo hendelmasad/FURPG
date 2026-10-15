@@ -37,11 +37,8 @@ export class FUThreatSheet extends foundry.appv1.sheets.ActorSheet {
     const effectiveMax = context.system.isBoss ? baseMax + bossHits : baseMax;
     context.baseMax = baseMax;
     context.effectiveMax = effectiveMax;
-    context.hitBoxes = Array.from({ length: effectiveMax }, (_, i) => i < context.system.hits.value);
-
     const TE = foundry.applications?.ux?.TextEditor?.implementation ?? TextEditor;
     const enrichOpts = { secrets: this.actor.isOwner, relativeTo: this.actor };
-    context.enrichedTags = await TE.enrichHTML(context.system.tags || "", enrichOpts);
     context.enrichedNotes = await TE.enrichHTML(context.system.notes || "", enrichOpts);
     context.enrichedDescription = await TE.enrichHTML(context.system.description || "", enrichOpts);
     return context;
@@ -51,7 +48,6 @@ export class FUThreatSheet extends foundry.appv1.sheets.ActorSheet {
     super.activateListeners(html);
     if (!this.isEditable) return;
 
-    html.find("[data-action='track-set']").on("click", ev => this._onTrackSet(ev));
     html.find("[data-action='hits-max-inc']").on("click", () => this._adjustHitsMax(1));
     html.find("[data-action='hits-max-dec']").on("click", () => this._adjustHitsMax(-1));
 
@@ -65,14 +61,6 @@ export class FUThreatSheet extends foundry.appv1.sheets.ActorSheet {
     html.find("[data-action='action-delete']").on("click", ev => this._deleteAction(ev));
 
     html.find("[data-action='portrait-lightbox']").on("contextmenu", ev => this._openPortraitLightbox(ev));
-  }
-
-  async _onTrackSet(ev) {
-    ev.preventDefault();
-    const index = Number(ev.currentTarget.dataset.index);
-    const current = this.actor.system.hits.value;
-    const newValue = (current === index + 1) ? index : index + 1;
-    await this.actor.update({ "system.hits.value": newValue });
   }
 
   async _adjustHitsMax(delta) {

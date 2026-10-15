@@ -240,5 +240,6 @@
   "FU.Settings.MaxAdvantages.Name": "Maximum Advantages",
   "FU.Settings.MaxAdvantages.Hint": "Maximum Advantages per character before Custom indicator triggers. Default: 3.",
   "FU.Settings.MaxTies.Name": "Maximum Ties",
-  "FU.Settings.MaxTies.Hint": "Maximum Ties per character before Custom indicator triggers. Default: 2."
+  "FU.Settings.MaxTies.Hint": "Maximum Ties per character before Custom indicator triggers. Default: 2.",
+  "FU.RestoreToMax": "Restore to max"
 }

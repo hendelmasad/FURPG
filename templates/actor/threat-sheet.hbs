@@ -52,16 +52,16 @@
           <span class="fu-boss-pcs-calc">{{baseMax}} + {{system.bossHits}} = {{effectiveMax}}</span>
         </div>
       {{/if}}
-      <div class="fu-track fu-track-hits">
-        {{#each hitBoxes as |filled i|}}
-          <span class="fu-box{{#if filled}} filled{{/if}}" data-action="track-set" data-index="{{i}}"></span>
-        {{/each}}
+      <div class="fu-number-track">
+        <input type="number" name="system.hits.value" value="{{system.hits.value}}" min="0" max="{{effectiveMax}}" />
+        <span class="fu-track-sep">/</span>
+        <input type="number" name="system.hits.max" value="{{system.hits.max}}" min="0" />
       </div>
     </section>
 
-    <section class="fu-block fu-memo">
+    <section class="fu-block">
       <header><h2>{{localize "FU.Tags"}}</h2></header>
-      {{editor enrichedTags target="system.tags" button=true editable=editable engine="prosemirror" collaborate=false}}
+      <textarea name="system.tags" rows="5" placeholder="{{localize 'FU.ThreatTagsPH'}}">{{system.tags}}</textarea>
     </section>
 
     <section class="fu-block">

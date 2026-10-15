@@ -58,20 +58,22 @@
     <div class="tab" data-tab="main">
 
       <div class="fu-tracks">
-        <div class="fu-track-block">
-          <label>{{localize "FU.Hits"}} <span class="fu-track-readout">{{system.hits.value}} / {{system.hits.max}}</span></label>
-          <div class="fu-track fu-track-hits">
-            {{#each hitBoxes as |filled i|}}
-              <span class="fu-box{{#if filled}} filled{{/if}}" data-action="track-set" data-target="hits" data-index="{{i}}"></span>
-            {{/each}}
+        <div class="fu-track-block fu-track-number">
+          <label>{{localize "FU.Hits"}}</label>
+          <div class="fu-number-track">
+            <input type="number" name="system.hits.value" value="{{system.hits.value}}" min="0" />
+            <span class="fu-track-sep">/</span>
+            <input type="number" name="system.hits.max" value="{{system.hits.max}}" min="0" />
+            <button type="button" class="fu-track-rest" data-action="track-rest" data-target="hits" title="{{localize 'FU.RestoreToMax'}}"><i class="fas fa-redo"></i></button>
           </div>
         </div>
-        <div class="fu-track-block">
-          <label>{{localize "FU.DramaPoints"}} <span class="fu-track-readout">{{system.dramaPoints.value}} / {{system.dramaPoints.max}}</span></label>
-          <div class="fu-track fu-track-drama">
-            {{#each dramaBoxes as |filled i|}}
-              <span class="fu-box{{#if filled}} filled{{/if}}" data-action="track-set" data-target="dramaPoints" data-index="{{i}}"></span>
-            {{/each}}
+        <div class="fu-track-block fu-track-number">
+          <label>{{localize "FU.DramaPoints"}}</label>
+          <div class="fu-number-track">
+            <input type="number" name="system.dramaPoints.value" value="{{system.dramaPoints.value}}" min="0" />
+            <span class="fu-track-sep">/</span>
+            <input type="number" name="system.dramaPoints.max" value="{{system.dramaPoints.max}}" min="0" />
+            <button type="button" class="fu-track-rest" data-action="track-rest" data-target="dramaPoints" title="{{localize 'FU.RestoreToMax'}}"><i class="fas fa-redo"></i></button>
           </div>
         </div>
       </div>

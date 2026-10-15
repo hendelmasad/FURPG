@@ -285,6 +285,54 @@
   color: var(--fu-ink);
 }
 
+.fu-track-number {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fu-number-track {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.fu-number-track input[type="number"] {
+  width: 42px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--fu-ink) !important;
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid var(--fu-brass-mid) !important;
+  font-family: "Cinzel", "Georgia", serif !important;
+  padding: 0 2px;
+}
+
+.fu-track-sep {
+  color: var(--fu-brass-mid);
+  font-family: "Cinzel", serif;
+  font-size: 16px;
+}
+
+.fu-track-rest {
+  background: transparent;
+  border: 1px solid var(--fu-brass-dark);
+  border-radius: 3px;
+  color: var(--fu-brass-mid);
+  cursor: pointer;
+  font-size: 11px;
+  padding: 2px 5px;
+  margin-left: 4px;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.fu-track-rest:hover {
+  color: var(--fu-brass-bright);
+  border-color: var(--fu-brass-bright);
+}
+
 .fu-track {
   display: flex;
   gap: 4px;
@@ -642,7 +690,6 @@
 }
 
 .fu-gear-tags-list {
-  display: none;
   margin-top: 4px;
   padding-left: 22px;
   border-left: 1px solid var(--fu-brass-mid);
