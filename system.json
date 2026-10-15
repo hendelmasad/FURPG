@@ -78,6 +78,6 @@
   "primaryTokenAttribute": "hits",
   "secondaryTokenAttribute": "dramaPoints",
   "url": "https://github.com/hendelmasad/FURPG",
-  "manifest": "https://github.com/hendelmasad/FURPG/releases/latest/download/system.json",
-  "download": "https://github.com/hendelmasad/FURPG/releases/download/v1.0.0/freeform-universal.zip"
+  "manifest": "https://raw.githubusercontent.com/hendelmasad/FURPG/main/system.json",
+  "download": "https://github.com/hendelmasad/FURPG/archive/refs/heads/main.zip"
 }
