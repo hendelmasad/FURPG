@@ -104,6 +104,6 @@ export function registerSettings() {
       "four": "FU.Settings.OracleMode.Four",
       "six": "FU.Settings.OracleMode.Six"
     },
-    default: "four"
+    default: "six"
   });
 }
