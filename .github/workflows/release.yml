@@ -1,0 +1,35 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build zip with correct folder name
+        run: |
+          mkdir -p dist
+          zip -r dist/freeform-universal.zip . \
+            --exclude "*.git*" \
+            --exclude "*.claude*" \
+            --exclude "dist/*" \
+            --exclude "packs_backup/*" \
+            --exclude "*.zip" \
+            --exclude "packs/**/LOCK" \
+            --exclude "packs/**/LOG" \
+            --exclude "packs/**/LOG.old"
+
+      - name: Upload to latest release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Latest
+          files: dist/freeform-universal.zip
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
