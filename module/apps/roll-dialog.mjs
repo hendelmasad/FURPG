@@ -23,7 +23,7 @@ function getFourBandResult(highest) {
  * Defaults to "four" if the setting is somehow unavailable.
  */
 function getOracleResult(highest) {
-  const mode = game.settings.get("freeform-universal", "oracleMode") ?? "six";
+  const mode = game.settings.get("freeform-universal", "oracleMode") ?? "four";
   if (mode === "six") {
     return ORACLE_SIX[highest];
   }
@@ -42,7 +42,7 @@ function getOracleResult(highest) {
  * Resolves to the number of luck points actually spent (so the chat
  * breakdown only reports real spend, not the declared maximum).
  */
-function promptALittleLuck({ actionValues, dangerValues, budget }) {
+export function promptALittleLuck({ actionValues, dangerValues, budget }) {
   return new Promise(resolve => {
     const state = {
       action: actionValues.slice(),
@@ -162,7 +162,7 @@ export class FURollDialog extends Dialog {
     }
   }
 
-  static async execute({ actor = null, action = 1, danger = 0, flavor = "", breakdown = null, luck = 0 }) {
+  static async execute({ actor = null, action = 1, danger = 0, flavor = "", breakdown = null }) {
     // Two separate Roll objects so Dice So Nice can colour Action vs Danger dice distinctly.
     const actionRoll = new Roll(`${action}d6`);
     await actionRoll.evaluate({ async: true });
@@ -173,27 +173,8 @@ export class FURollDialog extends Dialog {
       await dangerRoll.evaluate({ async: true });
     }
 
-    let actionResults = actionRoll.dice[0].results.map(r => r.result);
-    let dangerResults = dangerRoll ? dangerRoll.dice[0].results.map(r => r.result) : [];
-
-    // A Little Luck — spend Drama Points to nudge dice by ±1 pip each, applied
-    // before cancellation since adjusting a Danger Die can change what it cancels.
-    let luckSpent = 0;
-    const luckBudget = Math.max(0, Number(luck) || 0);
-    if (luckBudget > 0) {
-      const result = await promptALittleLuck({
-        actionValues: actionResults,
-        dangerValues: dangerResults,
-        budget: luckBudget
-      });
-      actionResults = result.action;
-      dangerResults = result.danger;
-      luckSpent = result.spent;
-      if (luckSpent > 0) {
-        const dramaCurrent = Number(actor?.system?.dramaPoints?.value) || 0;
-        if (actor) await actor.update({ "system.dramaPoints.value": Math.max(0, dramaCurrent - luckSpent) });
-      }
-    }
+    const actionResults = actionRoll.dice[0].results.map(r => r.result);
+    const dangerResults = dangerRoll ? dangerRoll.dice[0].results.map(r => r.result) : [];
 
     const actionRolls = actionResults.map(v => ({ value: v, cancelled: false }));
     const dangerRolls = dangerResults.map(v => ({ value: v, cancelled: false }));
@@ -217,10 +198,8 @@ export class FURollDialog extends Dialog {
       oracleLabel = game.i18n.localize("FU.Oracle.Botch");
     } else {
       const onlyOnes = remaining.every(v => v === 1);
-      const mode = game.settings.get("freeform-universal", "oracleMode") ?? "six";
-      if (onlyOnes && mode !== "six") {
-        // Only 1s remaining — Botch in four-band mode only.
-        // In six-outcome mode, 1s resolve as "No, and..." (ORACLE_SIX[1]), not a Botch.
+      if (onlyOnes) {
+        // Only 1s remaining — Botch (same in both Oracle modes)
         botch = true;
         outcome = 0;
         oracleLabel = game.i18n.localize("FU.Oracle.Botch");
@@ -246,12 +225,12 @@ export class FURollDialog extends Dialog {
     }
 
     const fullBreakdown = Array.isArray(breakdown) ? breakdown.slice() : [];
-    if (luckSpent > 0) {
-      fullBreakdown.push({
-        label: game.i18n.localize("FU.AR.ALittleLuck"),
-        items: [game.i18n.format("FU.AR.ALittleLuckSpent", { n: luckSpent })]
-      });
-    }
+
+    // Determine if the current user can spend Drama Points on this roll:
+    // - GMs can always see the buttons
+    // - Players see them only for their own actors
+    const actorOwnerId = actor ? Object.entries(actor.ownership ?? {}).find(([, lvl]) => lvl >= 3 && game.users.get(_k => _k === _))?.[0] : null;
+    const isOwner = actor ? (game.user.isGM || actor.isOwner) : game.user.isGM;
 
     const rendered = await renderTemplate("systems/freeform-universal/templates/chat/roll-result.hbs", {
       flavor,
@@ -266,7 +245,8 @@ export class FURollDialog extends Dialog {
       hasBoons: boons > 0,
       breakdown: fullBreakdown.length ? fullBreakdown : null,
       actionTotal: action,
-      dangerTotal: danger
+      dangerTotal: danger,
+      canSpend: isOwner
     });
 
     // Dice So Nice: show each pool with its own colorset. Note the dice shown here
@@ -298,12 +278,25 @@ export class FURollDialog extends Dialog {
       await Promise.all(showPromises);
     }
 
+    // Store raw roll data in flags so post-roll buttons can re-run or apply luck
+    const rollFlags = {
+      actorId: actor?.id ?? null,
+      action,
+      danger,
+      flavor,
+      breakdown: fullBreakdown.length ? fullBreakdown : null,
+      // Raw (pre-cancellation) results so A Little Luck can nudge them
+      actionResults,
+      dangerResults
+    };
+
     const chatData = {
       type: "base",
       user: game.user.id,
       speaker: ChatMessage.getSpeaker({ actor }),
       content: rendered,
-      sound: dsnActive ? null : CONFIG.sounds.dice
+      sound: dsnActive ? null : CONFIG.sounds.dice,
+      flags: { "freeform-universal": rollFlags }
     };
     await ChatMessage.create(chatData);
   }
