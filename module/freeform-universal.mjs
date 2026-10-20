@@ -32,6 +32,9 @@ Hooks.on("preCreateActor", (doc, data, options, userId) => {
   if (data.type !== "character") return true;
   if (options._fromTemplate || options._isBlank) return true;
   if (doc.pack) return true;
+  // Skip dialog when dragging from a compendium (actor already has data)
+  if (options.fromCompendium) return true;
+  if (data._id && data.system && Object.keys(data.system).length > 0) return true;
   const actorName = data.name?.trim() || "New Character";
   // Close Foundry's native Create Actor panel
   Object.values(ui.windows).forEach(w => {
