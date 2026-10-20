@@ -3,7 +3,7 @@
   "title": "Freeform Universal",
   "socket": true,
   "description": "A fiction-first narrative RPG using pools of Action Dice vs Danger Dice. Only players roll; the GM never rolls. Resolution uses a six-outcome Oracle.",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "compatibility": {
     "minimum": "12",
     "verified": "14",
