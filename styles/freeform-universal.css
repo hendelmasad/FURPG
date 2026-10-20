@@ -2432,3 +2432,41 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+/* -------------------------------------------------------------------------- */
+/*  Post-roll Drama Point buttons (Do-over / A Little Luck)                   */
+/* -------------------------------------------------------------------------- */
+
+.fu-post-roll-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(139, 105, 20, 0.3);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.fu-post-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: rgba(139, 105, 20, 0.12);
+  border: 1px solid #8B6914;
+  border-radius: 3px;
+  color: #8B6914;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.fu-post-btn:hover {
+  background: #8B6914;
+  color: #f0e8c8;
+}
+
+.fu-post-btn i {
+  font-size: 11px;
+}

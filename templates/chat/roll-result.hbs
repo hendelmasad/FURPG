@@ -41,4 +41,15 @@
       <div class="fu-roll-detail">{{localize "FU.RollHighest"}}: <strong>{{outcome}}</strong></div>
     {{/unless}}
   </div>
+
+  {{#if canSpend}}
+    <div class="fu-post-roll-actions">
+      <button type="button" class="fu-post-btn fu-doover-btn" title="{{localize "FU.Drama.DooverHint"}}">
+        <i class="fas fa-rotate-left"></i> {{localize "FU.Drama.Doover"}}
+      </button>
+      <button type="button" class="fu-post-btn fu-luck-btn-card" title="{{localize "FU.AR.ALittleLuckHint"}}">
+        <i class="fas fa-clover"></i> {{localize "FU.AR.ALittleLuck"}}
+      </button>
+    </div>
+  {{/if}}
 </div>

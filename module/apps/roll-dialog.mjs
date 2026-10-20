@@ -23,7 +23,7 @@ function getFourBandResult(highest) {
  * Defaults to "four" if the setting is somehow unavailable.
  */
 function getOracleResult(highest) {
-  const mode = game.settings.get("freeform-universal", "oracleMode") ?? "four";
+  const mode = game.settings.get("freeform-universal", "oracleMode") ?? "six";
   if (mode === "six") {
     return ORACLE_SIX[highest];
   }
@@ -217,8 +217,10 @@ export class FURollDialog extends Dialog {
       oracleLabel = game.i18n.localize("FU.Oracle.Botch");
     } else {
       const onlyOnes = remaining.every(v => v === 1);
-      if (onlyOnes) {
-        // Only 1s remaining — Botch (same in both Oracle modes)
+      const mode = game.settings.get("freeform-universal", "oracleMode") ?? "six";
+      if (onlyOnes && mode !== "six") {
+        // Only 1s remaining — Botch in four-band mode only.
+        // In six-outcome mode, 1s resolve as "No, and..." (ORACLE_SIX[1]), not a Botch.
         botch = true;
         outcome = 0;
         oracleLabel = game.i18n.localize("FU.Oracle.Botch");

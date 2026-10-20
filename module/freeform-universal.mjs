@@ -8,7 +8,7 @@ import { FUTieSheet } from "./sheets/tie-sheet.mjs";
 import { FUActor } from "./documents/actor.mjs";
 import { registerSettings } from "./helpers/settings.mjs";
 import { PressureTracker } from "./apps/pressure-tracker.mjs";
-import { FURollDialog } from "./apps/roll-dialog.mjs";
+import { FURollDialog, promptALittleLuck } from "./apps/roll-dialog.mjs";
 import { ActionRoller } from "./apps/action-roller.mjs";
 import { GMActionRoller } from "./apps/gm-action-roller.mjs";
 import { FUCharacterCreationDialog } from "./apps/character-creation-dialog.mjs";
@@ -43,6 +43,184 @@ Hooks.on("preCreateActor", (doc, data, options, userId) => {
   FUCharacterCreationDialog.show(actorName);
   return false;
 });
+
+/**
+ * Wire up post-roll Drama Point buttons on FU roll chat cards.
+ *
+ * Do-over    — spends 1 Drama Point, re-runs FURollDialog.execute() with the
+ *              same parameters stored in the message flags.
+ * A Little Luck — spends Drama Points (chosen interactively) to nudge dice
+ *              values ±1 pip each, then posts a new adjusted result card.
+ *              The original card's buttons are hidden after use so you can't
+ *              luck the same roll twice.
+ */
+Hooks.on("renderChatMessage", (message, html, _data) => {
+  const flags = message.flags?.["freeform-universal"];
+  if (!flags || typeof flags.action !== "number") return;
+
+  // Only show interactive buttons to the message author or the GM.
+  const canInteract = game.user.isGM || message.isAuthor;
+  if (!canInteract) {
+    html.find(".fu-post-roll-actions").hide();
+    return;
+  }
+
+  // Do-over button
+  html.find(".fu-doover-btn").on("click", async () => {
+    const actorId = flags.actorId;
+    const actor = actorId ? game.actors.get(actorId) : null;
+
+    // Spend 1 Drama Point
+    if (actor) {
+      const drama = Number(actor.system?.dramaPoints?.value) || 0;
+      if (drama < 1) {
+        ui.notifications.warn(game.i18n.localize("FU.Drama.NoDrama"));
+        return;
+      }
+      await actor.update({ "system.dramaPoints.value": drama - 1 });
+    }
+
+    // Hide buttons on the original card so it's clear this was used
+    html.find(".fu-post-roll-actions").hide();
+    await message.update({ "flags.freeform-universal.buttonsUsed": true });
+
+    // Re-roll with the same parameters
+    await FURollDialog.execute({
+      actor,
+      action: flags.action,
+      danger: flags.danger,
+      flavor: flags.flavor || "",
+      breakdown: flags.breakdown || null
+    });
+  });
+
+  // A Little Luck button
+  html.find(".fu-luck-btn-card").on("click", async () => {
+    const actorId = flags.actorId;
+    const actor = actorId ? game.actors.get(actorId) : null;
+
+    const drama = actor ? (Number(actor.system?.dramaPoints?.value) || 0) : 0;
+    if (drama < 1) {
+      ui.notifications.warn(game.i18n.localize("FU.Drama.NoDrama"));
+      return;
+    }
+
+    // Open the luck nudge dialog with the raw dice values from this roll
+    const result = await promptALittleLuck({
+      actionValues: flags.actionResults ?? [],
+      dangerValues: flags.dangerResults ?? [],
+      budget: drama
+    });
+
+    if (result.spent < 1) return; // Player cancelled without spending anything
+
+    // Deduct spent Drama Points
+    if (actor) {
+      await actor.update({ "system.dramaPoints.value": Math.max(0, drama - result.spent) });
+    }
+
+    // Hide buttons on the original card
+    html.find(".fu-post-roll-actions").hide();
+    await message.update({ "flags.freeform-universal.buttonsUsed": true });
+
+    // Re-run the result calculation with luck-adjusted dice values, then post a new card
+    const actionResults = result.action;
+    const dangerResults = result.danger;
+
+    const actionRolls = actionResults.map(v => ({ value: v, cancelled: false }));
+    const dangerRolls = dangerResults.map(v => ({ value: v, cancelled: false }));
+
+    for (const dd of dangerRolls) {
+      const matchIdx = actionRolls.findIndex(ar => !ar.cancelled && ar.value === dd.value);
+      if (matchIdx !== -1) {
+        actionRolls[matchIdx].cancelled = true;
+        dd.cancelled = true;
+      }
+    }
+
+    const remaining = actionRolls.filter(a => !a.cancelled).map(a => a.value);
+    let outcome, oracleLabel, boons = 0, botch = false;
+
+    if (remaining.length === 0) {
+      botch = true;
+      outcome = 0;
+      oracleLabel = game.i18n.localize("FU.Oracle.Botch");
+    } else {
+      const onlyOnes = remaining.every(v => v === 1);
+      if (onlyOnes) {
+        botch = true;
+        outcome = 0;
+        oracleLabel = game.i18n.localize("FU.Oracle.Botch");
+      } else {
+        const mode = game.settings.get("freeform-universal", "oracleMode") ?? "four";
+        const highest = Math.max(...remaining);
+        outcome = highest;
+        if (mode === "six") {
+          const SIX = { 6: "FU.Oracle.YesAnd", 5: "FU.Oracle.Yes", 4: "FU.Oracle.YesBut", 3: "FU.Oracle.NoBut", 2: "FU.Oracle.No", 1: "FU.Oracle.NoAnd" };
+          oracleLabel = game.i18n.localize(SIX[highest] ?? "FU.Oracle.NoAnd");
+        } else {
+          if (highest === 6) oracleLabel = game.i18n.localize("FU.Oracle.Complete");
+          else if (highest >= 4) oracleLabel = game.i18n.localize("FU.Oracle.Partial");
+          else oracleLabel = game.i18n.localize("FU.Oracle.Failure");
+        }
+        if (highest === 6) {
+          const sixes = remaining.filter(v => v === 6).length;
+          boons = Math.max(0, sixes - 1);
+        }
+      }
+    }
+
+    const fullBreakdown = Array.isArray(flags.breakdown) ? flags.breakdown.slice() : [];
+    fullBreakdown.push({
+      label: game.i18n.localize("FU.AR.ALittleLuck"),
+      items: [game.i18n.format("FU.AR.ALittleLuckSpent", { n: result.spent })]
+    });
+
+    const isOwner = actor ? (game.user.isGM || actor.isOwner) : game.user.isGM;
+
+    const rendered = await renderTemplate("systems/freeform-universal/templates/chat/roll-result.hbs", {
+      flavor: flags.flavor || "",
+      actorName: actor?.name || "",
+      actionRolls,
+      dangerRolls,
+      remaining,
+      botch,
+      outcome,
+      oracleLabel,
+      boons,
+      hasBoons: boons > 0,
+      breakdown: fullBreakdown,
+      actionTotal: flags.action,
+      dangerTotal: flags.danger,
+      canSpend: isOwner
+    });
+
+    const rollFlags = {
+      actorId: actor?.id ?? null,
+      action: flags.action,
+      danger: flags.danger,
+      flavor: flags.flavor || "",
+      breakdown: fullBreakdown,
+      actionResults,
+      dangerResults
+    };
+
+    await ChatMessage.create({
+      type: "base",
+      user: game.user.id,
+      speaker: ChatMessage.getSpeaker({ actor }),
+      content: rendered,
+      sound: CONFIG.sounds.dice,
+      flags: { "freeform-universal": rollFlags }
+    });
+  });
+
+  // If buttons were already used (e.g. page reload after clicking), hide them
+  if (flags.buttonsUsed) {
+    html.find(".fu-post-roll-actions").hide();
+  }
+});
+
 Hooks.once("init", async function () {
   console.log("Freeform Universal | Initializing system");
 

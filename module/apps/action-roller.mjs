@@ -61,8 +61,7 @@ export class ActionRoller extends Application {
         .map(i => ({ id: i.id, name: i.name || "", checked: false })),
       danger: 0,
       favorable: 0,
-      dramaSpent: 0,
-      luck: 0
+      dramaSpent: 0
     };
   }
 
@@ -109,11 +108,6 @@ export class ActionRoller extends Application {
 
     const pool = this._computePool();
 
-    // A Little Luck can never declare more than the Drama Points on hand. Clamp the
-    // stored value too, in case Drama dropped (e.g. a second Trademark) after entry.
-    const luck = Math.min(Math.max(0, Number(this.state.luck) || 0), drama);
-    this.state.luck = luck;
-
     return {
       actorName: this.actor.name,
       isGM: game.user.isGM,
@@ -124,8 +118,6 @@ export class ActionRoller extends Application {
       conditions: simpleList(this.state.conditions, "FU.AR.UnnamedCondition"),
       danger: this.state.danger,
       favorable: this.state.favorable,
-      luck,
-      luckMax: drama,
       actionCount: pool.action,
       dangerCount: pool.danger,
       dramaCurrent: drama,
@@ -176,7 +168,6 @@ export class ActionRoller extends Application {
     html.find("[data-ar='condition']").on("change", ev => this._onSimpleToggle(ev, "conditions", html));
     html.find("[data-ar='danger-mod']").on("input change", ev => this._onModChange(ev, "danger", html));
     html.find("[data-ar='favorable-mod']").on("input change", ev => this._onModChange(ev, "favorable", html));
-    html.find("[data-ar='luck']").on("input change", ev => this._onLuckChange(ev));
     html.find("[data-ar='roll']").on("click", () => this._executeRoll());
   }
 
@@ -277,13 +268,6 @@ export class ActionRoller extends Application {
     this._refreshSummary(html);
   }
 
-  _onLuckChange(ev) {
-    const drama = Number(this.actor.system.dramaPoints?.value) || 0;
-    const v = Math.max(0, Math.min(drama, Math.floor(Number(ev.currentTarget.value) || 0)));
-    this.state.luck = v;
-    ev.currentTarget.value = v;
-  }
-
   _refreshSummary(html) {
     const { action, danger } = this._computePool();
     html.find(".ar-action-count").text(action);
@@ -338,14 +322,12 @@ export class ActionRoller extends Application {
   async _executeRoll() {
     const { action, danger } = this._computePool();
     const breakdown = this._buildBreakdown();
-    const drama = Number(this.actor.system.dramaPoints?.value) || 0;
-    const luck = Math.min(Math.max(0, Number(this.state.luck) || 0), drama);
 
     // If the rolling user is a GM, skip confirmation and roll immediately.
     if (game.user.isGM) {
       this._rollExecuted = true;
       await this.close();
-      await FURollDialog.execute({ actor: this.actor, action, danger, breakdown, luck });
+      await FURollDialog.execute({ actor: this.actor, action, danger, breakdown });
       return;
     }
 
@@ -357,7 +339,7 @@ export class ActionRoller extends Application {
       ui.notifications.warn(game.i18n.localize("FU.AR.NoGMOnline"));
       this._rollExecuted = true;
       await this.close();
-      await FURollDialog.execute({ actor: this.actor, action, danger, breakdown, luck });
+      await FURollDialog.execute({ actor: this.actor, action, danger, breakdown });
       return;
     }
 
@@ -370,7 +352,6 @@ export class ActionRoller extends Application {
       action,
       danger,
       breakdown,
-      luck,
       // Full selection state so the GM review window can pre-populate.
       rollerState: foundry.utils.deepClone(this.state),
       targetGMId: activeGM.id
